@@ -1,6 +1,23 @@
 #!/bin/bash
 
-echo -n "KEY: " 
-cat $1|awk '/BEGIN PRIVATE KEY/,/END PRIVATE KEY/ { print $0 }' | openssl rsa -noout -modulus|openssl md5
-echo -n CERT:
-cat $1|openssl x509 -noout -modulus|openssl md5
+if [[ "$1" == "" ]]
+then
+	echo "Usage: $0 <file> "
+	echo Where the file contains both the certificate and the private key
+	echo Note: This script was written with HAProxy styled pem files in mind.
+	echo If the file contains multiple certificates, the key is compared to the first
+	echo certificate it finds.
+fi
+
+KEY=$(cat $1|awk '/BEGIN PRIVATE KEY/,/END PRIVATE KEY/ { print $0 }' | openssl rsa -noout -modulus|openssl md5)
+echo "KEY: $KEY" 
+CERT=$(cat $1|openssl x509 -noout -modulus|openssl md5)
+echo "CERT: $CERT"
+
+if [[ $KEY == $CERT ]]
+then
+	echo "[ OK   ] The key in this file was used to sign the certificate in the file."
+else
+	echo "[ FAIL ] The key in this file was NOT used to sign the certificate in the file."
+fi
+

@@ -1,6 +1,10 @@
 #!/bin/bash
 
-echo ${0} ${*}
+if [[ "$1" == "" ]]
+then
+	echo "Usage: $0 <file>"
+	exit -1
+fi
 
 let NUMCERT=$(grep 'BEGIN CERT' $1|wc -l)
 
