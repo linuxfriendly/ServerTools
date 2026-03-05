@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo ${0} ${*}
+
+let NUMCERT=$(grep 'BEGIN CERT' $1|wc -l)
+
+echo "Number of certificates in file :" $NUMCERT
+let i=0
+while [ $i -lt $NUMCERT ]
+do
+ let i=i+1
+ (awk -v n="$i" -v RS="-----END CERTIFICATE-----" 'NR==n{gsub(/^-----BEGIN CERTIFICATE-----$/,""); print}' $1;echo '-----END CERTIFICATE-----')|sed '/^$/d'|openssl x509 -noout -subject -ext subjectAltName -issuer -enddate
+ echo "---"
+done

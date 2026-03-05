@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo -n "KEY: " 
+cat $1|awk '/BEGIN PRIVATE KEY/,/END PRIVATE KEY/ { print $0 }' | openssl rsa -noout -modulus|openssl md5
+echo -n CERT:
+cat $1|openssl x509 -noout -modulus|openssl md5
